@@ -70,3 +70,19 @@ Ao final, verifique que: (a) a situação da aluna `2024003` é a **mesma** nos 
 Conforme a ficha de atividade prática: identificadores em português, um arquivo `.java` por classe pública, código formatado, entrega no repositório Git com README e commits descritivos. O uso de IA para gerar o código é proibido nesta atividade (ver seção 5.3 da ficha).
 
 > **Projeto Integrador:** a Etapa 2, com entrega na Aula 13, exige a aplicação justificada de ao menos um padrão estrutural. O que você produzir aqui pode ser aproveitado nela — desde que a justificativa descreva o problema do SIGA, e não apenas o nome do padrão.
+## Relatório de Refatoração — Padrões Estruturais
+
+### 1. Análise dos Deslizes (Etapa 1)
+- **Deslize 1 (Divergência de Dados):** Ocorria inconsistência na leitura da situação do aluno. No `ImportadorAlunos`, a verificação utilizava `"A".equals(linha[2])` (sensível a maiúsculas/minúsculas), fazendo com que valores como `"a"` fossem tratados como inativos. No `RelatorioSituacao`, utilizava-se `"A".equalsIgnoreCase(linha[2])`, originando estados divergentes para o mesmo registo.
+- **Deslize 2 (Acoplamento Concreto):** O cliente dependia diretamente da classe concreta `SecretariaLegadoWS`, impedindo a substituição de fornecedores de dados.
+- **Deslize 3 (Violação de Camadas):** A classe de apresentação (`TelaMatricula`) orquestrava diretamente seis dependências do subsistema e conhecia a ordem das regras de negócio.
+
+### 2. Padrão Adapter (Etapas 2 e 3)
+- Criada a interface `FonteDeAlunos` com o método `List<Aluno> listar()`.
+- Implementada a classe `AdaptadorSecretariaLegado`, centralizando a conversão da matriz de texto e padronizando o tratamento com `equalsIgnoreCase`.
+- `ImportadorAlunos` e `RelatorioSituacao` foram refatorados para consumir exclusivamente a abstração `FonteDeAlunos`.
+
+### 3. Padrão Facade (Etapa 4)
+- Criada a classe `FachadaMatricula`, encapsulando as seis classes do subsistema (`ValidadorCpf`, `AlunoDAO`, `ControleVagas`, `CalculadoraDesconto`, `MatriculaDAO` e `NotificadorEmail`).
+- A lógica de negócio foi isolada no método `matricular(...)`.
+- `TelaMatricula` passou a depender unicamente da fachada, reduzindo o acoplamento da camada visual.
